@@ -13,6 +13,55 @@ paths:
       responses:
         "200":
           description: Returns list of items stored in the fridge
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+                x-content-type: application/json
       x-openapi-router-controller: swagger_server.controllers.default_controller
-components: {}
+components:
+  schemas:
+    Item:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1234
+        name:
+          type: string
+          example: eggs
+        serving:
+          type: number
+          format: float
+          example: 1.4
+        unit:
+          type: string
+          example: kg
+          enum:
+          - g
+          - kg
+          - package
+        stored_at:
+          type: string
+          format: timestamp
+          example: "1614499915"
+        outdated_at:
+          type: string
+          format: timestamp
+          example: "1614500000"
+        updated_at:
+          type: string
+          format: timestamp
+          example: "1614499945"
+      description: Item is basic entity which can be stored in the fridge
+      example:
+        unit: kg
+        outdated_at: "1614500000"
+        updated_at: "1614499945"
+        name: eggs
+        id: 1234
+        serving: 1.4
+        stored_at: "1614499915"
 

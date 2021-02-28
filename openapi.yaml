@@ -5,6 +5,39 @@ info:
 servers:
   - url: http://localhost:8080
 
+
+components:
+  schemas:
+    Item:
+      description: Item is basic entity which can be stored in the fridge
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1234
+        name:
+          type: string
+          example: eggs
+        serving:
+          type: number
+          format: float
+          example: 1.4
+        unit:
+          type: string
+          enum: [g, kg, package]
+          example: kg
+        stored_at:
+          type: string
+          format: timestamp
+          example: 1614499915
+        outdated_at:
+          type: string
+          format: timestamp
+          example: 1614500000
+        updated_at:
+          type: string
+          format: timestamp
+          example: 1614499945
 paths:
   /item:
     get:
@@ -12,3 +45,9 @@ paths:
       responses:
         '200':
           description: Returns list of items stored in the fridge
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Item"
