@@ -32,3 +32,8 @@ Create a mock server with API
 
 Run request to the mock server
 ![request mock server](src/mock%20get%20item.png)
+
+## FastAPI Server
+
+Just simple initiated server already has a lot of features.
+![fastapi init](src/fastapi%20init.png)
