@@ -4,10 +4,45 @@ import models  # type: ignore
 from repo import MemStorage  # type: ignore
 import http
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+
+import time
+from uuid import uuid4
 
 app = FastAPI()
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1"])
 storage = MemStorage()
+origins = [
+    "http://127.0.0.1",
+    "http://127.0.0.1:8080",
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
+    allow_headers=["*"],
+)
+
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
+
+
+@app.middleware("http")
+async def add_correlation_id_header(request: Request, call_next):
+    correlation_id = request.headers.get("X-Correlation-Id", str(uuid4()))
+    response = await call_next(request)
+    response.headers["X-Correlation-Id"] = correlation_id
+    return response
 
 
 @app.get("/item", response_model=typing.List[models.Item])
@@ -30,7 +65,7 @@ def create_item(item: models.Item):
     return storage.create(item)
 
 
-@app.delete("/item/{item.id}", status_code=http.HTTPStatus.NO_CONTENT)
+@app.delete("/item/{item.id}", status_code=http.HTTPStatus.NO_CONTENT, responses={404: {"model": models.Item}})
 def delete_item(item_id: int):
     try:
         storage.delete(item_id)

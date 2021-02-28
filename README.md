@@ -35,5 +35,5 @@ Run request to the mock server
 
 ## FastAPI Server
 
-Just simple initiated server already has a lot of features.
+Just a simple initiated server already has a lot of features.
 ![fastapi init](src/fastapi%20init.png)
