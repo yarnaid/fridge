@@ -1,0 +1,14 @@
+openapi: '3.0.2'
+info:
+  title: Fridge app
+  version: '1.0'
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /item:
+    get:
+      description: The item resource is endpoint for CRUD operations with the food in the fridge
+      responses:
+        '200':
+          description: Returns list of items stored in the fridge
