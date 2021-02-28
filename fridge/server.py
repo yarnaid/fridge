@@ -1,10 +1,11 @@
 import typing
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Security, Depends
 import models  # type: ignore
 from repo import MemStorage  # type: ignore
 import http
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security.api_key import APIKeyQuery, APIKey
 
 import time
 from uuid import uuid4
@@ -26,6 +27,16 @@ app.add_middleware(
     allow_methods=["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
     allow_headers=["*"],
 )
+
+API_KEY = "secret"
+API_KEY_NAME = "apikey"
+key_security = APIKeyQuery(name=API_KEY_NAME)
+
+
+async def check_api_key(key: str = Security(key_security)):
+    if key == API_KEY:
+        return key_security
+    raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail="invalid api key")
 
 
 @app.middleware("http")
@@ -67,6 +78,14 @@ def create_item(item: models.Item):
 
 @app.delete("/item/{item.id}", status_code=http.HTTPStatus.NO_CONTENT, responses={404: {"model": models.Item}})
 def delete_item(item_id: int):
+    try:
+        storage.delete(item_id)
+    except KeyError:
+        raise HTTPException(status_code=http.HTTPStatus.NOT_FOUND, detail=f"Item with id={item_id} not found")
+
+
+@app.delete("/sec/item/{item.id}", status_code=http.HTTPStatus.NO_CONTENT, responses={404: {"model": models.Item}})
+def secure_delete_item(item_id: int, apikey: APIKey = Depends(check_api_key)):
     try:
         storage.delete(item_id)
     except KeyError:
