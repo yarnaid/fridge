@@ -151,7 +151,7 @@ class Item(Model):
         :param unit: The unit of this Item.
         :type unit: str
         """
-        allowed_values = ["g", "kg", "package"]  # noqa: E501
+        allowed_values = ["g", "kg", "package", "l"]  # noqa: E501
         if unit not in allowed_values:
             raise ValueError(
                 "Invalid value for `unit` ({0}), must be one of {1}"

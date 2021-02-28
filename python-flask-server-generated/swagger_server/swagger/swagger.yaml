@@ -20,6 +20,15 @@ paths:
                 items:
                   $ref: '#/components/schemas/Item'
                 x-content-type: application/json
+              examples:
+                strange:
+                  value:
+                  - name: eggs
+                    unit: g
+                    serving: 24.3
+                  - name: milk
+                    serving: 1.5
+                    unit: l
       x-openapi-router-controller: swagger_server.controllers.default_controller
 components:
   schemas:
@@ -43,6 +52,7 @@ components:
           - g
           - kg
           - package
+          - l
         stored_at:
           type: string
           format: timestamp

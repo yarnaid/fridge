@@ -21,3 +21,14 @@ For the generation of the mock we also can use the same editor, but for educatio
 ### Generate a Mock Server with Minimal API
 
 ![Mock server](src/mock%20server.png)
+
+### Generate a Mock Server with Postman
+
+Create an API for Postman
+![postman api](src/postman%20API.png)
+
+Create a mock server with API
+![postman mock](src/postman%20mock.png)
+
+Run request to the mock server
+![request mock server](src/mock%20get%20item.png)
