@@ -1,11 +1,13 @@
 import typing
-from fastapi import FastAPI, HTTPException, Request, Security, Depends
+from fastapi import FastAPI, HTTPException, Request, Security, Depends, Response
 import models  # type: ignore
 from repo import MemStorage  # type: ignore
 import http
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security.api_key import APIKeyQuery, APIKey
+from datetime import datetime
+from datetime import timedelta
 
 import time
 from uuid import uuid4
@@ -56,15 +58,27 @@ async def add_correlation_id_header(request: Request, call_next):
     return response
 
 
+@app.middleware("http")
+async def add_cache_header(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "max-age=10"
+    response.headers["Date"] = str(datetime.now())
+    response.headers["Expires"] = str(datetime.now() + timedelta(hours=1))
+    return response
+
+
 @app.get("/item", response_model=typing.List[models.Item])
 def items_list() -> typing.List[models.Item]:
     return storage.get_all()
 
 
 @app.get("/item/{item_id}", response_model=models.Item)
-def item(item_id: int):
+def item(item_id: int, response: Response):
     try:
-        return storage.get(item_id)
+        item = storage.get(item_id)
+        response.headers["ETag"] = str(hash(item.updated_at))
+        response.headers["Last-Modified"] = str(item.updated_at)
+        return item
     except KeyError:
         raise HTTPException(status_code=http.HTTPStatus.NOT_FOUND, detail=f"Item with id={item_id} not found")
 
